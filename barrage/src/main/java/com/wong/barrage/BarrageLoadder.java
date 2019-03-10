@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * 弹幕加载工具类
@@ -23,19 +24,17 @@ public class BarrageLoadder {
      * @param size
      * @return
      */
-    private static int index = 0;
     public static List<Barrage> get(int pageIndex, int pageSize) {
-        index = 0;
         List<Barrage> barrageList = new ArrayList<>();
-        try {
-            Files.lines(Paths.get("barrage.txt")).forEach(line -> {
-                if (!StringUtil.isEmpty(line) && index >= pageIndex && index < pageIndex + pageSize) {
-                    line = line.replaceAll("</br>", "\n");
-                    barrageList.add(new Barrage(line, ConfigUtil.getColor(), ConfigUtil.getFont(), 
-                            ConfigUtil.getLocationTop()));
-                    index++;
-                }
-            });
+        try (Stream<String> stream = Files.lines(Paths.get("barrage.txt"))) {
+            stream.skip(pageIndex)
+                .limit(pageSize)
+                .forEach(line -> {
+                    if (!StringUtil.isEmpty(line)) {
+                        barrageList.add(new Barrage(line, ConfigUtil.getColor(), ConfigUtil.getFont(), 
+                                ConfigUtil.getLocationTop()));
+                    }
+                });
         } catch (IOException e) {
             e.printStackTrace();
         }
