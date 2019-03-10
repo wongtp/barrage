@@ -32,7 +32,7 @@ public class BarrageLoadder {
                 .forEach(line -> {
                     if (!StringUtil.isEmpty(line)) {
                         barrageList.add(new Barrage(line, ConfigUtil.getColor(), ConfigUtil.getFont(), 
-                                ConfigUtil.getLocationTop()));
+                                ConfigUtil.getLocationTop(), ConfigUtil.isLeftDirect()));
                     }
                 });
         } catch (IOException e) {
