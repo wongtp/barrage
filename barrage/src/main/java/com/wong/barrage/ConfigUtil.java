@@ -48,6 +48,9 @@ public class ConfigUtil {
     /** 是否重复，所有弹幕发射完后，是否重头开始发射 */
     private static boolean repeat;
     
+    /** 是否允许并发执行 */
+    private static boolean parallel;
+    
     /** 不解释 */
     private static Properties props;
     
@@ -78,6 +81,7 @@ public class ConfigUtil {
         batchSchedule = getInt("batchSchedule", 300) * 1000;
         font = new Font(getString("fontName", "宋体"), getInt("fontStyle", 1), getInt("fontSize", 30));
         repeat =  getInt("repeat", 2) == 2 ? true : false;
+        parallel =  getInt("parallel", 2) == 2 ? true : false;
         timeInterval = getInt("timeInterval", 2);
         
         // 初始化弹幕发射方向
@@ -190,6 +194,10 @@ public class ConfigUtil {
         return timeInterval;
     }
     
+    public static boolean isParallel() {
+        return parallel;
+    }
+
     /**
      * 获取一个大于 0 的配置值，如果配置的值小于 0，则使用给定的默认值
      * @param key

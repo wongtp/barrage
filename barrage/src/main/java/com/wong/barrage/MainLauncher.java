@@ -3,7 +3,14 @@
  */
 package com.wong.barrage;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 /**
  * 
@@ -13,8 +20,14 @@ import java.util.List;
  */
 public class MainLauncher {
     
+    ExecutorService barragePool = Executors.newCachedThreadPool(); 
+    
     public static void main(String[] args) {
-        new MainLauncher().launch();
+        JLabel label = new JLabel("hahahahah");
+        label.setFont(ConfigUtil.getFont());
+        label.setForeground(ConfigUtil.getColor());
+        JOptionPane.showMessageDialog(label, null);
+        // new MainLauncher().launch();
     }
     
     public void launch() {
@@ -46,7 +59,11 @@ public class MainLauncher {
                 return;
             }
             pageIndex += ConfigUtil.getBatchNumber();
-            shut(barrageList);
+            if (ConfigUtil.isParallel()) {
+                shutParallel(barrageList);
+            } else {
+                shut(barrageList);
+            }
             Thread.sleep(ConfigUtil.getBatchSchedule());
         }
     }
@@ -78,6 +95,22 @@ public class MainLauncher {
                 current = System.currentTimeMillis();
                 changeTimeFlag = false;
             }
+        }
+    }
+    
+    private void shutParallel(List<Barrage> barrageList) throws Exception {
+        int barrier = 0;
+        List<Future<Boolean>> taskList = new ArrayList<>();
+        while (true) {
+            barragePool.submit(barrageList.get(barrier));
+            Thread.sleep(ConfigUtil.getTimeInterval() );
+            barrier++;
+            if (barrier >= barrageList.size()) {
+                break;
+            }
+        }
+        for (Future<Boolean> future : taskList) {
+            future.get();
         }
     }
 }

@@ -8,6 +8,7 @@ import java.awt.Font;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 /**
  * 弹幕实体类，实际上是一个 JFrame
@@ -15,13 +16,17 @@ import javax.swing.JLabel;
  * @date 2019-03-07 22:11
  * @version 1.0
  */
-public class Barrage {
+public class Barrage implements Runnable {
     
     private JFrame jFrame = new JFrame();
     private int locationTop;
     private int textWidth;
     private int paddingLeft;
     private int paddingLeftBak;
+    
+    public void add() {
+        
+    }
     
     public Barrage(String text, Color fontColor, Font font, int locationTop) {
         this.textWidth = text.length() * font.getSize() + 10;
@@ -45,6 +50,8 @@ public class Barrage {
         jFrame.setType(JFrame.Type.UTILITY);
         jFrame.setVisible(true);
         jFrame.setAlwaysOnTop(true);
+        
+        JOptionPane.showMessageDialog(label, null);
     }
     
     /**
@@ -63,5 +70,18 @@ public class Barrage {
             return true;
         }
         return false;
+    }
+    
+    @Override
+    public void run() {
+        int sleepTime = ConfigUtil.getElapse() * 500 / (int)ConfigUtil.getScreenSize().getWidth();
+        try {
+            while (!move()) {
+                Thread.sleep(sleepTime);
+                System.out.println("当前线程=== " + Thread.currentThread().getName());
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
