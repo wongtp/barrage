@@ -7,11 +7,15 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.Random;
+
+import javax.swing.JOptionPane;
 
 /**
  * 负责配置文件的加载及部分配置项的转换
@@ -19,7 +23,7 @@ import java.util.Random;
  * @date 2019-03-08 19:15
  * @version 1.0
  */
-public class ConfigUtil {
+public class ConfigLoader {
     
     /** 字体颜色 */
     private static Color color;
@@ -30,8 +34,8 @@ public class ConfigUtil {
     /** 从屏幕一侧滚动到另外一侧的时间，单位秒 */
     private static int elapse;
     
-    /** 弹幕滚动方向，true：向左，false：向右 */
-    private static boolean leftDirect;
+    /** 弹幕滚动方向，true：向右，false：向左 */
+    private static Boolean rightDirect;
     
     /** 弹幕距离屏幕顶端位置 */
     private static Integer locationTop;
@@ -49,7 +53,7 @@ public class ConfigUtil {
     private static boolean repeat;
     
     /** 是否允许并发执行 */
-    private static boolean parallel;
+    private static boolean radomSpeed;
     
     /** 不解释 */
     private static Properties props;
@@ -61,13 +65,18 @@ public class ConfigUtil {
     private static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     
     static {
+        Path path = Paths.get("config.properties");
+        if (Files.notExists(path)) {
+            JOptionPane.showMessageDialog(null, "config.properties 配置文件不见了", "Σ(*ﾟдﾟﾉ)ﾉ", JOptionPane.WARNING_MESSAGE);
+            System.exit(0);
+        }
         props = new Properties();
-        try(InputStream inputStream = new FileInputStream("config.properties")) {
+        try(InputStream inputStream = Files.newInputStream(path)) {
             if(inputStream != null) {
                 props.load(inputStream);
             }
-        } catch (IOException e1) {
-            e1.printStackTrace();
+        } catch (IOException e) {
+            LogUtil.append("log.log", "while init config:" + e.getMessage());
         }
         init();
     }
@@ -78,26 +87,27 @@ public class ConfigUtil {
     private static void init() {
         elapse = getInt("elapse", 15);
         batchNumber = getInt("batchNumber", 10);
-        batchSchedule = getInt("batchSchedule", 300) * 1000;
+        batchSchedule = getInt("batchSchedule", 300);
         font = new Font(getString("fontName", "宋体"), getInt("fontStyle", 1), getInt("fontSize", 30));
         repeat =  getInt("repeat", 2) == 2 ? true : false;
-        parallel =  getInt("parallel", 2) == 2 ? true : false;
+        radomSpeed =  getInt("radomSpeed", 2) == 2 ? true : false;
         timeInterval = getInt("timeInterval", 2);
         
         // 初始化弹幕发射方向
         String direct = getString("direct");
         if ("left".equals(direct)) {
-            leftDirect = false;
-        } else {
-            leftDirect = true;
+            rightDirect = false;
+        } else if ("right".equals(direct)) {
+            rightDirect = true;
         }
         
         // 初始化字体位置
         String position = getString("position");
         if ("bottom".equals(position)) {
-            locationTop = (int) screenSize.getHeight();
+            // 用随机数来生成位置，预防弹幕重合
+            locationTop = (int) screenSize.getHeight() - 20;
         } else if ("top".equals(position)) {
-            locationTop = 0;
+            locationTop = 10;
         } else if (StringUtil.isNumber(position)) {
             locationTop = Integer.parseInt(position);
         }
@@ -162,8 +172,11 @@ public class ConfigUtil {
         return elapse;
     }
 
-    public static boolean isLeftDirect() {
-        return leftDirect;
+    public static boolean isRightDirect() {
+        if (rightDirect == null) {
+            return random.nextInt(6) > 3;
+        }
+        return rightDirect;
     }
 
     public static Integer getLocationTop() {
@@ -194,8 +207,12 @@ public class ConfigUtil {
         return timeInterval;
     }
     
-    public static boolean isParallel() {
-        return parallel;
+    public static boolean isRadomSpeed() {
+        return radomSpeed;
+    }
+    
+    public static Random getRandom() {
+        return random;
     }
 
     /**

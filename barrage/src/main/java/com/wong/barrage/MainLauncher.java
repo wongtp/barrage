@@ -4,93 +4,65 @@
 package com.wong.barrage;
 
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
- * 
+ * 主启动类
  * @author 黄小天
  * @date 2019-03-09 13:48
  * @version 1.0
  */
 public class MainLauncher {
     
-    BarrageManager manager = new BarrageManager();
+    private BarrageManager manager = new BarrageManager();
+    // 负责定时加载弹幕批次
+    private ScheduledExecutorService batchSchedule = Executors.newSingleThreadScheduledExecutor();
     
     public static void main(String[] args) {
         new MainLauncher().launch();
     }
     
     public void launch() {
+        batchSchedule.scheduleAtFixedRate(new BatchLoader(), 0, ConfigLoader.getBatchSchedule(), TimeUnit.SECONDS);
         try {
-            boolean repeat = ConfigUtil.isRepeat();
-            if (repeat) {
-                // 这个死循环负责重复执行弹幕
-                while (true) {
-                    shutAllBarrage();
+            while (true) {
+                manager.move();
+                if (!ConfigLoader.isRadomSpeed()) {
+                    Thread.sleep(ConfigLoader.getElapse());
+                } else {
+                    Thread.sleep(20);
                 }
-            } else {
-                shutAllBarrage();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.append("log.log", "while launch:" + e.getMessage());
         }
     }
     
-    /**
-     * 把文件中的所有弹幕都遍历一遍
-     * @throws InterruptedException 
-     */
-    private void shutAllBarrage() throws Exception {
-        int pageIndex = 0;
-        // 这个死循环负责遍历弹幕文件的所有弹幕
-        while (true) {
-            List<Barrage> barrageList = BarrageLoadder.get(pageIndex, ConfigUtil.getBatchNumber());
-            if (barrageList.size() == 0) {
-                return;
-            }
-            pageIndex += ConfigUtil.getBatchNumber();
-            shut(barrageList);
-            Thread.sleep(ConfigUtil.getBatchSchedule());
-        }
-    }
-    
-    private void shut(List<Barrage> barrageList) throws Exception {
-        for (Barrage barrage : barrageList) {
-            manager.addBarrage(barrage);
-        }
-        while (!manager.isFinish()) {
-            manager.move(ConfigUtil.isLeftDirect());
+    private class BatchLoader implements Runnable {
+        // 弹幕批次数据索引
+        private int pageIndex = LogUtil.getPageIndex();
+        @Override
+        public void run() {
             try {
-                Thread.sleep(25);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                List<Barrage> barrageList = BarrageLoadder.get(pageIndex, ConfigLoader.getBatchNumber());
+                if (barrageList.size() > 0) {
+                    pageIndex += ConfigLoader.getBatchNumber();
+                    for (Barrage barrage : barrageList) {
+                        manager.addBarrage(barrage);
+                        Thread.sleep(ConfigLoader.getTimeInterval());
+                    }
+                    LogUtil.writePageIndex(pageIndex);
+                } else if (ConfigLoader.isRepeat()) {
+                    pageIndex = 0;
+                } else {
+                    LogUtil.writePageIndex(0);
+                    System.exit(0);
+                }
+            } catch (Exception e) {
+                LogUtil.append("log.log", "while run BatchLoader:" + e.getMessage());
             }
         }
-        /*long current = System.currentTimeMillis();
-        int barrier = 0;
-        int finishCount = 0;
-        boolean changeTimeFlag = false;
-        int sleepTime = ConfigUtil.getElapse() * 500 / (int)ConfigUtil.getScreenSize().getWidth();
-        // 这个死循环负责把 barrageList 这一批从屏幕一边送到另外一边
-        while (true) {
-            if (System.currentTimeMillis() - current > ConfigUtil.getTimeInterval() 
-                    && barrageList.size() > barrier) {
-                changeTimeFlag = true;
-                barrier++;
-            }
-            for (int i = finishCount; i < barrier; i++) {
-                if (barrageList.get(i).move()) {
-                    finishCount++;
-                }
-                if (finishCount == barrageList.size()) {
-                    return;
-                }
-            }
-            Thread.sleep(sleepTime);
-            // 这样的写的做法是，减少上面 for 循环以及睡眠带来是时间误差
-            if (changeTimeFlag) {
-                current = System.currentTimeMillis();
-                changeTimeFlag = false;
-            }
-        }*/
     }
 }

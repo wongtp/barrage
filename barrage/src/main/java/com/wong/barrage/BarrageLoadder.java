@@ -3,12 +3,14 @@
  */
 package com.wong.barrage;
 
-import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+
+import javax.swing.JOptionPane;
 
 /**
  * 弹幕加载工具类
@@ -26,17 +28,21 @@ public class BarrageLoadder {
      */
     public static List<Barrage> get(int pageIndex, int pageSize) {
         List<Barrage> barrageList = new ArrayList<>();
-        try (Stream<String> stream = Files.lines(Paths.get("barrage.txt"))) {
+        Path path = Paths.get("barrage.txt");
+        if (Files.notExists(path)) {
+            JOptionPane.showMessageDialog(null, "barrage.txt 弹幕文件不见了", "Σ(*ﾟдﾟﾉ)ﾉ", JOptionPane.WARNING_MESSAGE);
+            System.exit(0);
+        }
+        try (Stream<String> stream = Files.lines(path)) {
             stream.skip(pageIndex)
                 .limit(pageSize)
                 .forEach(line -> {
                     if (!StringUtil.isEmpty(line)) {
-                        barrageList.add(new Barrage(line, ConfigUtil.getColor(), ConfigUtil.getFont(), 
-                                ConfigUtil.getLocationTop(), ConfigUtil.isLeftDirect()));
+                        barrageList.add(new Barrage(line));
                     }
                 });
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            LogUtil.append("log.log", "BarrageLoadder thorw exception:" + e.getMessage());
         }
         return barrageList;
     }
