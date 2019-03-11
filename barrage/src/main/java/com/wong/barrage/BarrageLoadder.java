@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
@@ -35,11 +36,16 @@ public class BarrageLoadder {
         }
         try (Stream<String> stream = Files.lines(path)) {
             stream.skip(pageIndex)
+                // 遇到空行则跳过
+                .filter(new Predicate<String>() {
+                    @Override
+                    public boolean test(String line) {
+                        return !StringUtil.isEmpty(line);
+                    }
+                })
                 .limit(pageSize)
                 .forEach(line -> {
-                    if (!StringUtil.isEmpty(line)) {
-                        barrageList.add(new Barrage(line));
-                    }
+                    barrageList.add(new Barrage(line));
                 });
         } catch (Exception e) {
             LogUtil.append("log.log", "BarrageLoadder thorw exception:" + e.getMessage());

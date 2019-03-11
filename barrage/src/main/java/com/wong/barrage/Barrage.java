@@ -39,7 +39,7 @@ public class Barrage extends JLabel {
         } else {
             moveWidth = screenWidth;
         }
-        this.setBounds(moveWidth, ConfigLoader.getLocationTop(), textWidth, font.getSize());
+        this.setBounds(moveWidth, ConfigLoader.getLocationTop(), textWidth, font.getSize() * 2);
         if (ConfigLoader.isRadomSpeed()) {
             speed = ConfigLoader.getRandom().nextInt(textWidth/(3 * font.getSize()));
             // 如果产生的随机数是 0 的话，弹幕会静止不动

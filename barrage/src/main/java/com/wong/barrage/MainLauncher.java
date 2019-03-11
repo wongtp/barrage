@@ -43,6 +43,13 @@ public class MainLauncher {
     private class BatchLoader implements Runnable {
         // 弹幕批次数据索引
         private int pageIndex = LogUtil.getPageIndex();
+        BatchLoader() {
+            if (ConfigLoader.isRefershPageIndex()) {
+                pageIndex = 0;
+            } else {
+                pageIndex = LogUtil.getPageIndex();
+            }
+        }
         @Override
         public void run() {
             try {

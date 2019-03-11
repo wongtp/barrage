@@ -37,9 +37,6 @@ public class ConfigLoader {
     /** 弹幕滚动方向，true：向右，false：向左 */
     private static Boolean rightDirect;
     
-    /** 弹幕距离屏幕顶端位置 */
-    private static Integer locationTop;
-    
     /** 每批发射的弹幕的数量 */
     private static int batchNumber;
     
@@ -54,6 +51,11 @@ public class ConfigLoader {
     
     /** 是否允许并发执行 */
     private static boolean radomSpeed;
+    /** 每次重启后，弹幕都重头开始读取 */
+    private static boolean refershPageIndex;
+    
+    /** 弹幕位置 */
+    private static String position;
     
     /** 不解释 */
     private static Properties props;
@@ -91,6 +93,7 @@ public class ConfigLoader {
         font = new Font(getString("fontName", "宋体"), getInt("fontStyle", 1), getInt("fontSize", 30));
         repeat =  getInt("repeat", 2) == 2 ? true : false;
         radomSpeed =  getInt("radomSpeed", 2) == 2 ? true : false;
+        refershPageIndex =  getInt("refershPageIndex", 2) == 2 ? true : false;
         timeInterval = getInt("timeInterval", 2);
         
         // 初始化弹幕发射方向
@@ -102,15 +105,7 @@ public class ConfigLoader {
         }
         
         // 初始化字体位置
-        String position = getString("position");
-        if ("bottom".equals(position)) {
-            // 用随机数来生成位置，预防弹幕重合
-            locationTop = (int) screenSize.getHeight() - 20;
-        } else if ("top".equals(position)) {
-            locationTop = 10;
-        } else if (StringUtil.isNumber(position)) {
-            locationTop = Integer.parseInt(position);
-        }
+        position = getString("position");
         
         // 初始化字体颜色
         String colorStr = getString("fontColor");
@@ -179,12 +174,30 @@ public class ConfigLoader {
         return rightDirect;
     }
 
+    // 用于防止前后两个弹幕重合，=_=#!
+    private static boolean changeFlag = false;
     public static Integer getLocationTop() {
-        if (locationTop == null) {
+        int y;
+        if ("bottom".equals(position)) {
+            // 用随机数来生成位置，预防弹幕重合
+            y = (int)screenSize.getHeight() - font.getSize()*2;
+        } else if ("top".equals(position)) {
+            y =  font.getSize()*2;
+        } else if ("center".equals(position)) {
+            y =  (int)screenSize.getHeight()/2;
+        } else if (StringUtil.isNumber(position)) {
+            y =  Integer.parseInt(position);
+        } else {
             // 生成随机位置
-            return random.nextInt((int)screenSize.getHeight() - 100);
+            y =  (int)screenSize.getHeight() - random.nextInt((int)screenSize.getHeight() - font.getSize());
         }
-        return locationTop;
+        if (changeFlag) {
+            changeFlag = false;
+            return y - font.getSize();
+        } else {
+            changeFlag = true;
+            return y;
+        }
     }
 
     public static int getBatchNumber() {
@@ -213,6 +226,10 @@ public class ConfigLoader {
     
     public static Random getRandom() {
         return random;
+    }
+    
+    public static boolean isRefershPageIndex() {
+        return refershPageIndex;
     }
 
     /**
