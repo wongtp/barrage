@@ -32,7 +32,7 @@ public class ConfigLoader {
     private static Font font;
     
     /** 从屏幕一侧滚动到另外一侧的时间，单位秒 */
-    private static int elapse;
+    private static int speed;
     
     /** 弹幕滚动方向，true：向右，false：向左 */
     private static Boolean rightDirect;
@@ -87,7 +87,7 @@ public class ConfigLoader {
      * 初始化配置项参数
      */
     private static void init() {
-        elapse = getInt("elapse", 15);
+        speed = getInt("speed", 15);
         batchNumber = getInt("batchNumber", 10);
         batchSchedule = getInt("batchSchedule", 300);
         font = new Font(getString("fontName", "宋体"), getInt("fontStyle", 1), getInt("fontSize", 30));
@@ -163,8 +163,8 @@ public class ConfigLoader {
         return font;
     }
 
-    public static int getElapse() {
-        return elapse;
+    public static int getSpeed() {
+        return speed;
     }
 
     public static boolean isRightDirect() {

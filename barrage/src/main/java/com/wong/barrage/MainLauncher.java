@@ -30,7 +30,7 @@ public class MainLauncher {
             while (true) {
                 manager.move();
                 if (!ConfigLoader.isRadomSpeed()) {
-                    Thread.sleep(ConfigLoader.getElapse());
+                    Thread.sleep(ConfigLoader.getSpeed());
                 } else {
                     Thread.sleep(20);
                 }
