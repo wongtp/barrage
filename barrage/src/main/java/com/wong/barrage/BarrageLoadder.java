@@ -13,6 +13,9 @@ import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
+import com.wong.barrage.util.LogUtil;
+import com.wong.barrage.util.StringUtil;
+
 /**
  * 弹幕加载工具类
  * @author 黄小天

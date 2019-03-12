@@ -8,6 +8,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.wong.barrage.util.LogUtil;
+
 /**
  * 主启动类
  * @author 黄小天

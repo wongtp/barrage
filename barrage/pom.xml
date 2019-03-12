@@ -28,6 +28,23 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+            <plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-jar-plugin</artifactId>
+			    <configuration>
+			        <source>1.8</source>
+			        <target>1.8</target>
+			        <archive>
+			            <manifest>
+			                <mainClass>com.wong.barrage.MainLauncher</mainClass>
+			                <addClasspath>true</addClasspath>
+			                <classpathPrefix>lib/</classpathPrefix>
+			            </manifest>
+			        </archive>
+			        <classesDirectory>
+			        </classesDirectory>
+			    </configuration>
+            </plugin>
         </plugins>
         <finalName>barrage</finalName>
     </build>

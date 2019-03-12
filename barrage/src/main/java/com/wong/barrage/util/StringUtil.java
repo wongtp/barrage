@@ -1,4 +1,4 @@
-package com.wong.barrage;
+package com.wong.barrage.util;
 
 import java.util.regex.Pattern;
 

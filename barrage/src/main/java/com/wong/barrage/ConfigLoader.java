@@ -17,6 +17,9 @@ import java.util.Random;
 
 import javax.swing.JOptionPane;
 
+import com.wong.barrage.util.LogUtil;
+import com.wong.barrage.util.StringUtil;
+
 /**
  * 负责配置文件的加载及部分配置项的转换
  * @author 黄小天
