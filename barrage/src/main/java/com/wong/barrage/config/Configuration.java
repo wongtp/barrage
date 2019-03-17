@@ -1,7 +1,7 @@
 /*
  * Copyleft
  */
-package com.wong.barrage;
+package com.wong.barrage.config;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,10 +26,13 @@ import com.wong.barrage.util.StringUtil;
  * @date 2019-03-08 19:15
  * @version 1.0
  */
-public class ConfigLoader {
+public class Configuration {
     
     /** 字体颜色 */
     private static Color color;
+    
+    /** 字体颜色 */
+    private static Color transparentColor = new Color(0, 0, 0, 0);
     
     /** 字体 */
     private static Font font;
@@ -70,9 +73,10 @@ public class ConfigLoader {
     private static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     
     static {
-        Path path = Paths.get("config.properties");
+        Path path = Paths.get(Constant.BARRAGE_PATH);
         if (Files.notExists(path)) {
-            JOptionPane.showMessageDialog(null, "config.properties 配置文件不见了", "Σ(*ﾟдﾟﾉ)ﾉ", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, Constant.BARRAGE_PATH + " 配置文件不见了", "Σ(*ﾟдﾟﾉ)ﾉ", 
+                    JOptionPane.WARNING_MESSAGE);
             System.exit(0);
         }
         props = new Properties();
@@ -81,7 +85,7 @@ public class ConfigLoader {
                 props.load(inputStream);
             }
         } catch (IOException e) {
-            LogUtil.append("log.log", "while init config:" + e.getMessage());
+            LogUtil.append(Constant.LOG_PATH, "while init config:" + e.getMessage());
         }
         init();
     }
@@ -202,6 +206,33 @@ public class ConfigLoader {
             return y;
         }
     }
+    
+    /**
+     * 获取上次读取的行数，使得不用每次重启都重新开始
+     * @param fileName
+     */
+    public static int getPageIndex() {
+        Path path = Paths.get(Constant.PAGEINDEX_PATH);
+        try {
+            if (Files.exists(path)) {
+                byte[] byteArr = Files.readAllBytes(path);
+                if (byteArr != null && byteArr.length > 0) {
+                    return Integer.parseInt(new String(byteArr));
+                } else {
+                    writePageIndex(0);
+                }
+            } else {
+                writePageIndex(0);
+            }
+        } catch (Exception e) {
+            LogUtil.append(Constant.LOG_PATH, "error while read pageIndex file:" + e.getMessage());
+        }
+        return 0;
+    }
+    
+    public static void writePageIndex(int pageIndex) {
+        LogUtil.write(Constant.PAGEINDEX_PATH, String.valueOf(pageIndex));
+    }
 
     public static int getBatchNumber() {
         return batchNumber;
@@ -233,6 +264,10 @@ public class ConfigLoader {
     
     public static boolean isRefershPageIndex() {
         return refershPageIndex;
+    }
+    
+    public static Color getTransparentColor() {
+        return transparentColor;
     }
 
     /**

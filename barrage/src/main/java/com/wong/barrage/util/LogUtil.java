@@ -33,33 +33,6 @@ public class LogUtil {
         write(fileName, value, StandardOpenOption.WRITE);
     }
     
-    /**
-     * 获取文件中的所有内容
-     * @param fileName
-     */
-    public static int getPageIndex() {
-        Path path = Paths.get("pageIndex");
-        try {
-            if (Files.exists(path)) {
-                byte[] arr = Files.readAllBytes(path);
-                if (arr != null && arr.length > 0) {
-                    return Integer.parseInt(new String(arr));
-                } else {
-                    writePageIndex(0);
-                }
-            } else {
-                writePageIndex(0);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    
-    public static void writePageIndex(int pageIndex) {
-        write("pageIndex", pageIndex + "");
-    }
-    
     private static void write(String fileName, String value, OpenOption option) {
         Path path = Paths.get(fileName);
         try {

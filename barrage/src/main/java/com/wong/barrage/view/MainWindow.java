@@ -1,41 +1,37 @@
 /*
  * Copyleft
  */
-package com.wong.barrage;
+package com.wong.barrage.view;
 
 import java.awt.AWTException;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
-import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
+import com.wong.barrage.config.Configuration;
+import com.wong.barrage.config.Constant;
+
 /**
- * 弹幕管理与移动控制类
+ * 
  * @author 黄小天
- * @date 2019-03-09 15:48
+ * @date 2019-03-16 23:14
  * @version 1.0
  */
-public class BarrageManager {
+public class MainWindow {
     
     private JFrame frame = new JFrame();
-    private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    private List<Barrage> labelList = new CopyOnWriteArrayList<Barrage>();
     
-    public BarrageManager() {
-        frame.setSize(screenSize.width, screenSize.height);
+    public JFrame init() {
+        frame.setSize(Configuration.getScreenSize().width, Configuration.getScreenSize().height);
         // 隐藏窗口标题
         frame.setUndecorated(true);
-        frame.setBackground(new Color(0, 0, 0, 0));
+        frame.setBackground(Configuration.getTransparentColor());
         frame.setLocationByPlatform(true);
         frame.setResizable(false);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -45,36 +41,7 @@ public class BarrageManager {
         frame.setAlwaysOnTop(true);
         
         setTray();
-    }
-
-    /**
-     * 添加弹幕
-     * @param text
-     */
-    public void addBarrage(Barrage barrage) {
-        labelList.add(barrage);
-        frame.add(barrage);
-    }
-    
-    /**
-     * 执行弹幕移动
-     */
-    public void move() {
-        for (Barrage barrage : labelList) {
-            barrage.move();
-            if (barrage.isFinish()) {
-                frame.remove(barrage);
-                labelList.remove(barrage);
-            }
-        }
-    }
-    
-    /**
-     * 判断 labelList 中的弹幕是否所有都发送完毕
-     * @return 
-     */
-    public boolean isFinish() {
-        return labelList.size() == 0;
+        return frame;
     }
     
     private void setTray() {
@@ -85,7 +52,7 @@ public class BarrageManager {
             MenuItem exit = new MenuItem("exit");
             // 通过静态方法得到系统托盘
             SystemTray tray = SystemTray.getSystemTray();
-            ImageIcon img = new ImageIcon(getClass().getResource("/com/wong/barrage/res/icon.png"));
+            ImageIcon img = new ImageIcon(getClass().getResource(Constant.ICON_PATH));
             // 创建 TrayIcon对象得到托盘图标
             TrayIcon trayIcon = new TrayIcon(img.getImage(), "弹幕", popupMenu);
             // 按下退出键
@@ -106,5 +73,4 @@ public class BarrageManager {
             }
         }
     }
-    
 }
