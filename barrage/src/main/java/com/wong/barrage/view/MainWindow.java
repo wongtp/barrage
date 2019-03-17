@@ -4,6 +4,7 @@
 package com.wong.barrage.view;
 
 import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
@@ -14,7 +15,7 @@ import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
-import com.wong.barrage.config.Configuration;
+import com.wong.barrage.config.Config;
 import com.wong.barrage.config.Constant;
 
 /**
@@ -28,10 +29,10 @@ public class MainWindow {
     private JFrame frame = new JFrame();
     
     public JFrame init() {
-        frame.setSize(Configuration.getScreenSize().width, Configuration.getScreenSize().height);
+        frame.setSize(Config.getScreenSize().width, Config.getScreenSize().height);
         // 隐藏窗口标题
         frame.setUndecorated(true);
-        frame.setBackground(Configuration.getTransparentColor());
+        frame.setBackground(new Color(0, 0, 0, 0));
         frame.setLocationByPlatform(true);
         frame.setResizable(false);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);

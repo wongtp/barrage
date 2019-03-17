@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
 
-import com.wong.barrage.config.Configuration;
+import com.wong.barrage.config.Config;
 import com.wong.barrage.config.Constant;
 import com.wong.barrage.util.LogUtil;
 
@@ -33,12 +33,12 @@ public class BarrageLauncher {
     }
     
     public void launch() {
-        batchSchedule.scheduleAtFixedRate(new BatchLoader(), 0, Configuration.getBatchSchedule(), TimeUnit.SECONDS);
+        batchSchedule.scheduleAtFixedRate(new BatchLoader(), 0, Config.getBatchSchedule(), TimeUnit.SECONDS);
         try {
             while (true) {
                 this.move();
-                if (!Configuration.isRadomSpeed()) {
-                    Thread.sleep(Configuration.getSpeed());
+                if (!Config.isRadomSpeed()) {
+                    Thread.sleep(Config.getSpeed());
                 } else {
                     Thread.sleep(20);
                 }
@@ -75,29 +75,29 @@ public class BarrageLauncher {
      */
     private class BatchLoader implements Runnable {
         // 弹幕批次数据索引
-        int pageIndex = Configuration.getPageIndex();
+        int pageIndex = Config.getPageIndex();
         BatchLoader() {
-            if (Configuration.isRefershPageIndex()) {
+            if (Config.isRefershPageIndex()) {
                 pageIndex = 0;
             } else {
-                pageIndex = Configuration.getPageIndex();
+                pageIndex = Config.getPageIndex();
             }
         }
         @Override
         public void run() {
             try {
-                List<BarrageEntity> barrageList = BarrageLoadder.loadFromFile(pageIndex, Configuration.getBatchNumber());
+                List<BarrageEntity> barrageList = BarrageLoadder.loadFromFile(pageIndex, Config.getBatchNumber());
                 if (barrageList.size() > 0) {
-                    pageIndex += Configuration.getBatchNumber();
+                    pageIndex += Config.getBatchNumber();
                     for (BarrageEntity barrage : barrageList) {
                         addBarrage(barrage);
-                        Thread.sleep(Configuration.getTimeInterval());
+                        Thread.sleep(Config.getTimeInterval());
                     }
-                    Configuration.writePageIndex(pageIndex);
-                } else if (Configuration.isRepeat()) {
+                    Config.writePageIndex(pageIndex);
+                } else if (Config.isRepeat()) {
                     pageIndex = 0;
                 } else {
-                    Configuration.writePageIndex(0);
+                    Config.writePageIndex(0);
                     System.exit(0);
                 }
             } catch (Exception e) {

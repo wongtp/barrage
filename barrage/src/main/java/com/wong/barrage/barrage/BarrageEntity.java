@@ -3,25 +3,16 @@
  */
 package com.wong.barrage.barrage;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.Transparency;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import com.wong.barrage.config.Configuration;
-import com.wong.barrage.config.Constant;
+import com.wong.barrage.config.Config;
+import com.wong.barrage.util.ImgUtil;
 
 import sun.font.FontDesignMetrics;
 
@@ -34,7 +25,7 @@ import sun.font.FontDesignMetrics;
 @SuppressWarnings("serial")
 class BarrageEntity extends JLabel {
     
-    private int screenWidth = (int)Configuration.getScreenSize().getWidth();
+    private int screenWidth = (int)Config.getScreenSize().getWidth();
     /** 弹幕需要移动的距离 **/
     private int moveWidth;
     /** 弹幕是否完成了从屏幕一边到另外一边 **/
@@ -44,23 +35,8 @@ class BarrageEntity extends JLabel {
     /** 默认速度，只有在配置文件中开启了随机速度这个值又有效 **/
     private int speed = 1;
     private boolean stop = false;
-    private FontDesignMetrics metrics = FontDesignMetrics.getMetrics(Configuration.getFont());
-    
-    public void init(String text) {
-        int textWidth = metrics.stringWidth(text);
-        int textHeight = metrics.getHeight();
-        BufferedImage image = new BufferedImage(textWidth, textHeight, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = image.createGraphics();
-        graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-        //设置背影为透明
-        graphics.setColor(Configuration.getTransparentColor());
-        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
-        graphics.setFont(Configuration.getFont());
-        graphics.setColor(Color.WHITE);
-        graphics.drawString(text, 0, metrics.getAscent());//图片上写文字
-        graphics.dispose();
-    }
+    private int mouseX;
+    private int mouseY;
     
     /**
      * @param paddingTop：距离屏幕顶端位置
@@ -68,43 +44,27 @@ class BarrageEntity extends JLabel {
      */
     public BarrageEntity(String text) {
         super();
+        Font font = Config.getFont();
+        FontDesignMetrics metrics = FontDesignMetrics.getMetrics(font);
+        ImageIcon icon = ImgUtil.createImage(text, metrics, Config.getTransparentColor(), Config.getColor());
+        setIcon(icon);
+        
         int textWidth = metrics.stringWidth(text);
         int textHeight = metrics.getHeight();
-        BufferedImage image = new BufferedImage(textWidth, textHeight, BufferedImage.TYPE_4BYTE_ABGR);
-        Graphics2D g = image.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        //设置背影为透明
-        // g.setColor(Configuration.getTransparentColor());
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.2f));
-        g.fillRect(0, 0, image.getWidth(), image.getHeight());
-        g.setFont(Configuration.getFont());
-        g.setColor(Configuration.getColor());
-        // 图片上写文字
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-        g.drawString(text, 0, metrics.getAscent());
-        g.dispose();
-        setIcon(new ImageIcon(image));
-        try {
-            ImageIO.write(image, "png", new File("e:/a.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        this.setBackground(new Color(0, 0, 0, 0));
-        this.rightDirect = Configuration.isRightDirect();
+        this.rightDirect = Config.isRightDirect();
         if (rightDirect) {
             moveWidth = -textWidth;
         } else {
             moveWidth = screenWidth;
         }
-        this.setBounds(moveWidth, Configuration.getLocationTop(), textWidth, textHeight);
-        if (Configuration.isRadomSpeed()) {
-            speed = Configuration.getRandom().nextInt(textWidth/(3 * textHeight));
+        this.setBounds(moveWidth, Config.getLocationTop(), textWidth, textHeight);
+        if (Config.isRadomSpeed()) {
+            speed = Config.getRandom().nextInt(textWidth/(3 * textHeight));
             // 如果产生的随机数是 0 的话，弹幕会静止不动
             if (speed <= 0) {
                 speed = 1;
             }
         }
-        
         // 添加鼠标事件
         setMouseListener();
     }
@@ -138,19 +98,38 @@ class BarrageEntity extends JLabel {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                stop = !stop;
-                System.exit(0);
+                if (Config.getStopType() == 1) {
+                    stop = !stop;
+                }
             }
-            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (Config.getStopType() == 2) {
+                    stop = true;
+                }
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (Config.getMotivateType() == 2) {
+                    stop = false;
+                }
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mouseX = e.getX();
+                mouseY = e.getY();
+                if (Config.getStopType() == 2) {
+                    stop = true;
+                }
+            }
         });
-        
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 stop = true;
                 // 设置拖拽后，窗口的位置
-                moveWidth = e.getXOnScreen();
-                setLocation(e.getXOnScreen(), e.getYOnScreen());
+                moveWidth = e.getXOnScreen() - mouseX;
+                setLocation(moveWidth, e.getYOnScreen() - mouseY);
             }
         });
     }

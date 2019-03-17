@@ -9,54 +9,91 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.swing.ImageIcon;
-
-import com.wong.barrage.config.Configuration;
 
 import sun.font.FontDesignMetrics;
 
 /**
- * 
  * @author 黄小天
  * @date 2019-03-17 11:08
  * @version 1.0
  */
 public class ImgUtil {
     
-    public static void main(String[] args) throws Exception {
-        createImage("请A1003到3号窗口", new Font("宋体", Font.BOLD, 30), new File("e:/a.png"));
-    }
-
     /**
-     * 根据str,font的样式以及输出文件目录
-     * @param str   字符串
-     * @param font  字体
-     * @param outFile   输出文件位置
-     * @param width 宽度
-     * @param height    高度
-     * @return 
-     * @throws Exception
+     * 根据文字内容创建 ImageIcon
+     * @param text 文字内容
+     * @param font 字体样式
+     * @param bgColor 图片背景色
+     * @param fontColor 文字颜色
+     * @return
      */
-    public static ImageIcon createImage(String str, Font font, File outFile) throws Exception {
-        FontDesignMetrics metrics = FontDesignMetrics.getMetrics(font);
-        int width = metrics.stringWidth(str);
-        int height = metrics.getHeight();
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    public static ImageIcon createImage(String text, FontDesignMetrics metrics, Color bgColor, Color fontColor) {
+        int textWidth = metrics.stringWidth(text);
+        int textHeight = metrics.getHeight();
+        // TYPE_4BYTE_ABGR：透明
+        BufferedImage image = new BufferedImage(textWidth, textHeight, BufferedImage.TYPE_4BYTE_ABGR);
         Graphics2D graphics = image.createGraphics();
         graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-        //设置背影为透明
-        graphics.setColor(Configuration.getTransparentColor());
+        // 设置背景色
+        graphics.setColor(bgColor);
+        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+        graphics.setFont(metrics.getFont());
+        graphics.setColor(fontColor);
+        // 写字到画布上
+        graphics.drawString(text, 0, metrics.getAscent());
+        graphics.dispose();
+        // 输出透明 png 图片
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ImageOutputStream ios = new MemoryCacheImageOutputStream(bos);
+        try {
+            ImageIO.write(image, "png", ios);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ImageIcon(bos.toByteArray());
+    }
+    
+    /**
+     * 根据文字内容创建 ImageIcon
+     * @param text 文字内容
+     * @param font 字体样式
+     * @param bgColor 图片背景色
+     * @param fontColor 文字颜色
+     * @return
+     */
+    public static ImageIcon createImage(String text, Font font, Color bgColor, Color fontColor) {
+        FontDesignMetrics metrics = FontDesignMetrics.getMetrics(font);
+        int textWidth = metrics.stringWidth(text);
+        int textHeight = metrics.getHeight();
+        // TYPE_4BYTE_ABGR：透明
+        BufferedImage image = new BufferedImage(textWidth, textHeight, BufferedImage.TYPE_4BYTE_ABGR);
+        Graphics2D graphics = image.createGraphics();
+        graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+        // 设置背景色
+        graphics.setColor(bgColor);
         graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
         graphics.setFont(font);
-        graphics.setColor(Configuration.getColor());
-        graphics.drawString(str, 0, metrics.getAscent());//图片上写文字
+        graphics.setColor(fontColor);
+        // 写字到画布上
+        graphics.drawString(text, 0, metrics.getAscent());
         graphics.dispose();
-        // 输出png图片
-        ImageIO.write(image, "png", outFile);
-        return new ImageIcon(image);
+        // 输出透明 png 图片
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ImageOutputStream ios = new MemoryCacheImageOutputStream(bos);
+        try {
+            ImageIO.write(image, "png", ios);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ImageIcon(bos.toByteArray());
     }
 }
