@@ -23,5 +23,7 @@ public class Constant {
     public static final String LOG_PATH = "log.log";
     /** 弹幕索引文件位置 **/
     public static final String PAGEINDEX_PATH = "pageIndex";
+    /** 需要导入的词典文件所在的文件夹 **/
+    public static final String DICT_PATH = "dict";
 
 }
