@@ -1,4 +1,4 @@
-> 应该不需要解释什么是弹幕吧~~
+> 应该不需要解释什么是弹幕吧~~  
 > 之前其实已经写过一篇[Java 桌面弹幕工具](https://blog.csdn.net/ocp114/article/details/88385868)，超级简单的实现，在这里花了点时间完善了一下
 
 **具体可配置功能如下：**
@@ -15,7 +15,7 @@
  11. 弹幕的拖动
   
 **至于这些功能为什么要做成这样，因为不想背单词呗，所以搞个工具偶尔弹几条出来屏幕上**
-源码这里就不放出来了，有兴趣的同学可以上 [GitHub](https://github.com/wongtp/barrage) 上看看，这里付上一张效果图
+付上一张效果图：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20190317183730653.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L29jcDExNA==,size_16,color_FFFFFF,t_70)
 后续更能
  1. 增加导入功能，可以读取有道等词典的词典数据
