@@ -104,6 +104,7 @@ public class BarrageLauncher {
                     Config.writePageIndex(pageIndex);
                 } else if (Config.isRepeat()) {
                     pageIndex = 0;
+                    Config.writePageIndex(pageIndex);
                 } else {
                     Config.writePageIndex(0);
                     System.exit(0);
