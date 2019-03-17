@@ -105,7 +105,7 @@ public class Config {
         repeat =  getInt("repeat", 2) == 2 ? true : false;
         radomSpeed =  getInt("radomSpeed", 2) == 2 ? true : false;
         refershPageIndex =  getInt("refershPageIndex", 2) == 2 ? true : false;
-        timeInterval = getInt("timeInterval", 2);
+        timeInterval = getInt("timeInterval", 2000);
         stopType = getInt("stopType", 2);
         motivateType = getInt("motivateType", 2);
         
