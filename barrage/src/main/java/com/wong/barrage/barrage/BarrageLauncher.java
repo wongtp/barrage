@@ -23,15 +23,23 @@ import com.wong.barrage.util.LogUtil;
  */
 public class BarrageLauncher {
     
+    // 用来放置弹幕的窗体
     private JFrame frame;
+    // 用于存放需要发射的弹幕
     private List<BarrageEntity> barragelList = new CopyOnWriteArrayList<BarrageEntity>();
     // 负责定时分批加载弹幕
     private ScheduledExecutorService batchSchedule = Executors.newSingleThreadScheduledExecutor();
     
+    private BarrageLauncher() {}
+    
     public BarrageLauncher(JFrame frame) {
+        this();
         this.frame = frame;
     }
     
+    /**
+     * 开始你的表演吧！
+     */
     public void launch() {
         batchSchedule.scheduleAtFixedRate(new BatchLoader(), 0, Config.getBatchSchedule(), TimeUnit.SECONDS);
         try {

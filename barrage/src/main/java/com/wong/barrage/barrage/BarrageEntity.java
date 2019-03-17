@@ -34,21 +34,27 @@ class BarrageEntity extends JLabel {
     private boolean rightDirect;
     /** 默认速度，只有在配置文件中开启了随机速度这个值又有效 **/
     private int speed = 1;
+    /** 当前弹幕是否处于停止状态 **/
     private boolean stop = false;
+    /** 鼠标点击弹幕时在弹幕上的相对 x 坐标 **/
     private int mouseX;
+    /** 鼠标点击弹幕时在弹幕上的相对 y 坐标 **/
     private int mouseY;
     
+    private BarrageEntity() {}
     /**
      * @param paddingTop：距离屏幕顶端位置
      * @param rightDirect 移动的方向，ture 向右，false 向左
      */
     public BarrageEntity(String text) {
-        super();
+        this();
         Font font = Config.getFont();
         FontDesignMetrics metrics = FontDesignMetrics.getMetrics(font);
+        // 创建图片带代替直接用文字的方式，这样有更好的使用体验
         ImageIcon icon = ImgUtil.createImage(text, metrics, Config.getTransparentColor(), Config.getColor());
         setIcon(icon);
         
+        // 配置弹幕位置和需要移动的距离
         int textWidth = metrics.stringWidth(text);
         int textHeight = metrics.getHeight();
         this.rightDirect = Config.isRightDirect();
@@ -69,6 +75,9 @@ class BarrageEntity extends JLabel {
         setMouseListener();
     }
     
+    /**
+     * 让弹幕动起来
+     */
     public void move() {
         if (stop) {
             return;
@@ -94,11 +103,14 @@ class BarrageEntity extends JLabel {
         return finish;
     }
     
-    public void setMouseListener() {
+    /**
+     * 设置鼠标监听事件，主要是控制弹幕拖动和是否停止滚动
+     */
+    private void setMouseListener() {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (Config.getStopType() == 1) {
+                if (Config.getStopType() == 1 || Config.getMotivateType() == 1) {
                     stop = !stop;
                 }
             }

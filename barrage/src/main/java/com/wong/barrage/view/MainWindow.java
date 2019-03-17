@@ -19,7 +19,7 @@ import com.wong.barrage.config.Config;
 import com.wong.barrage.config.Constant;
 
 /**
- * 
+ * 弹幕承载主窗口
  * @author 黄小天
  * @date 2019-03-16 23:14
  * @version 1.0
