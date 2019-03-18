@@ -3,10 +3,8 @@
  */
 package com.wong.barrage.barrage;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.charset.MalformedInputException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,10 +13,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import javax.swing.JOptionPane;
-
 import com.wong.barrage.config.Constant;
-import com.wong.barrage.util.CharsetUtils;
+import com.wong.barrage.util.CharsetUtil;
 import com.wong.barrage.util.LogUtil;
 import com.wong.barrage.util.StringUtil;
 
@@ -38,7 +34,7 @@ public class DictConverter {
                 dictStream.forEach(new Consumer<Path>() {
                     @Override
                     public void accept(Path path) {
-                        try (Stream<String> stream = Files.lines(path, CharsetUtils.resolveCode(path.toString()))) {
+                        try (Stream<String> stream = Files.lines(path, CharsetUtil.resolveCharset(path.toString()))) {
                             stream.filter(new Predicate<String>() {
                                 @Override
                                 public boolean test(String line) {
@@ -51,13 +47,12 @@ public class DictConverter {
                         } catch (UncheckedIOException e) {
                             e.printStackTrace();
                         } catch (Exception e) {
-                            // e.printStackTrace();
-                            LogUtil.append(Constant.LOG_PATH, "BarrageLoadder thorw exception:" + e.getMessage());
+                            LogUtil.append(Constant.LOG_PATH, "DictConverter thorw exception:" + e.getMessage());
                         }
                     }
                 });
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

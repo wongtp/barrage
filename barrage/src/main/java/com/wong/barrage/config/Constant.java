@@ -9,7 +9,7 @@ package com.wong.barrage.config;
  * @date 2019-03-16 22:32
  * @version 1.0
  */
-public class Constant {
+public interface Constant {
     
     /** 系统托盘图标文件位置 **/
     public static final String ICON_PATH = "/com/wong/barrage/res/icon.png";

@@ -21,7 +21,7 @@ import com.wong.barrage.util.LogUtil;
 import com.wong.barrage.util.StringUtil;
 
 /**
- * 负责配置文件的加载及部分配置项的转换
+ *  负责配置文件的加载及部分配置项的转换
  * @author 黄小天
  * @date 2019-03-08 19:15
  * @version 1.0
@@ -29,7 +29,7 @@ import com.wong.barrage.util.StringUtil;
 public class Config {
     
     /** 字体颜色 */
-    private static Color color;
+    private static Color fontColor;
     
     /** jlabel 透明图片字体背景色，不能全部都是 0，如果全部都是 0 的话鼠标会穿透 */
     private static Color transparentColor = new Color(0, 0, 0, 1);
@@ -37,7 +37,7 @@ public class Config {
     /** 字体 */
     private static Font font;
     
-    /** 从屏幕一侧滚动到另外一侧的时间，单位秒 */
+    /** 从屏幕一侧滚动到另外一侧的速度 */
     private static int speed;
     
     /** 弹幕滚动方向，true：向右，false：向左 */
@@ -126,50 +126,50 @@ public class Config {
         if (colorStrArr.length == 3) {
             if (StringUtil.isNumber(colorStrArr[0]) && StringUtil.isNumber(colorStrArr[1])
                     && StringUtil.isNumber(colorStrArr[2])) {
-                color = new Color(Integer.parseInt(colorStrArr[0]), 
+                fontColor = new Color(Integer.parseInt(colorStrArr[0]), 
                         Integer.parseInt(colorStrArr[1]), Integer.parseInt(colorStrArr[2]));
             }
         } else if (colorStr.startsWith("#")) {
             try {
-                color = new Color(Integer.parseInt(colorStr.substring(1), 16));
+                fontColor = new Color(Integer.parseInt(colorStr.substring(1), 16));
             } catch (Exception e) {
-                color = null;
+                fontColor = null;
             }
         } else if ("white".equals(colorStr)) {
-            color = Color.white;
+            fontColor = Color.white;
         } else if ("lightGray".equals(colorStr)) {
-            color = Color.lightGray;
+            fontColor = Color.lightGray;
         } else if ("gray".equals(colorStr)) {
-            color = Color.gray;
+            fontColor = Color.gray;
         } else if ("darkGray".equals(colorStr)) {
-            color = Color.darkGray;
+            fontColor = Color.darkGray;
         } else if ("black".equals(colorStr)) {
-            color = Color.black;
+            fontColor = Color.black;
         } else if ("red".equals(colorStr)) {
-            color = Color.red;
+            fontColor = Color.red;
         } else if ("pink".equals(colorStr)) {
-            color = Color.pink;
+            fontColor = Color.pink;
         } else if ("orange".equals(colorStr)) {
-            color = Color.orange;
+            fontColor = Color.orange;
         } else if ("yellow".equals(colorStr)) {
-            color = Color.yellow;
+            fontColor = Color.yellow;
         } else if ("green".equals(colorStr)) {
-            color = Color.green;
+            fontColor = Color.green;
         } else if ("magenta".equals(colorStr)) {
-            color = Color.magenta;
+            fontColor = Color.magenta;
         } else if ("cyan".equals(colorStr)) {
-            color = Color.cyan;
+            fontColor = Color.cyan;
         } else if ("blue".equals(colorStr)) {
-            color = Color.blue;
+            fontColor = Color.blue;
         }
     }
     
     public static Color getColor() {
-        if (color == null) {
+        if (fontColor == null) {
             // 生成随机颜色，rgb 颜色 -16777216 ~ 0
             return new Color(-random.nextInt(16777216));
         }
-        return color;
+        return fontColor;
     }
 
     public static Font getFont() {
