@@ -19,10 +19,8 @@ public class CharsetUtil {
     
     public static Charset resolveCharset(String path) {
         try (InputStream is = Files.newInputStream(Paths.get(path))) {
-            BufferedInputStream bis = new BufferedInputStream(is);
-            bis.mark(0);
             byte[] head = new byte[3];    
-            bis.read(head);
+            is.read(head);
             System.out.println("head[0]:" + head[0] + 
                     ", head[1]:" + head[1] + 
                     ", head[2]:" + head[2]);
@@ -36,7 +34,7 @@ public class CharsetUtil {
             if((head[0] == -17 && head[1] == -69 && head[2] == -65)) {
                 return Charset.forName("UTF-8");
             }
-            if (isUTF8(bis)) {
+            if (isUTF8(is)) {
                 return Charset.forName("UTF-8");
             }
         } catch (Exception e) {
@@ -51,7 +49,9 @@ public class CharsetUtil {
      * @param is
      * @return
      */
-    private static boolean isUTF8(BufferedInputStream bis) throws Exception {
+    private static boolean isUTF8(InputStream is) throws Exception {
+        BufferedInputStream bis = new BufferedInputStream(is);
+        bis.mark(0);
         bis.reset();
         //读取第一个字节
         int code = bis.read();
@@ -135,10 +135,5 @@ public class CharsetUtil {
             }
         }
         return bitSet;
-    }
- 
-    public static void main(String[] args) {
-        System.out.println(Charset.availableCharsets());
-        System.out.println(resolveCharset("c:\\Users\\wongt\\Desktop\\youdao2.txt"));
     }
 }
