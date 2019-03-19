@@ -17,6 +17,13 @@ import com.wong.barrage.view.MainWindow;
 public class App {
     
     public static void main(String[] args) {
+        Runtime runtime = Runtime.getRuntime();  
+        runtime.addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.exit(0);
+            }
+        }));
         JFrame frame = new MainWindow().init();
         new BarrageLauncher(frame).launch();
     }

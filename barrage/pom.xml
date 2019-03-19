@@ -47,7 +47,7 @@
 					<target>1.8</target>
 					<archive>
 						<manifest>
-							<mainClass>com.wong.barrage.MainLauncher</mainClass>
+							<mainClass>com.wong.barrage.App</mainClass>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
 						</manifest>
