@@ -23,7 +23,7 @@ import sun.font.FontDesignMetrics;
  * @version 1.0
  */
 @SuppressWarnings("serial")
-class BarrageEntity extends JLabel {
+public class BarrageEntity extends JLabel {
     
     private int screenWidth = (int)Config.getScreenSize().getWidth();
     /** 弹幕需要移动的距离 **/

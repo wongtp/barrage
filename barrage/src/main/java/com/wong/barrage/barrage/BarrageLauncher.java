@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
 
+import com.wong.barrage.barrage.loader.BarrageLoadder;
+import com.wong.barrage.barrage.loader.impl.BarrageLoadderProxy;
 import com.wong.barrage.config.Config;
 import com.wong.barrage.config.Constant;
 import com.wong.barrage.util.LogUtil;
@@ -29,6 +31,7 @@ public class BarrageLauncher {
     private List<BarrageEntity> barragelList = new CopyOnWriteArrayList<BarrageEntity>();
     // 负责定时分批加载弹幕
     private ScheduledExecutorService batchSchedule = Executors.newSingleThreadScheduledExecutor();
+    private BarrageLoadder barrageLoadder = new BarrageLoadderProxy();
     
     private BarrageLauncher() {}
     
@@ -94,7 +97,7 @@ public class BarrageLauncher {
         @Override
         public void run() {
             try {
-                List<BarrageEntity> barrageList = BarrageLoadder.loadFromFile(pageIndex, Config.getBatchNumber());
+                List<BarrageEntity> barrageList = barrageLoadder.load(pageIndex, Config.getBatchNumber());
                 if (barrageList.size() > 0) {
                     pageIndex += Config.getBatchNumber();
                     for (BarrageEntity barrage : barrageList) {

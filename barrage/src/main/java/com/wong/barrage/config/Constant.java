@@ -17,8 +17,6 @@ public interface Constant {
     public static final String LABEL_BG_PATH = "/com/wong/barrage/res/labelBackground.png";
     /** 配置文件位置 **/
     public static final String CONFIG_PATH = "config.properties";
-    /** 弹幕文件位置 **/
-    public static final String BARRAGE_PATH = "barrage.txt";
     /** 日志文件位置 **/
     public static final String LOG_PATH = "log.log";
     /** 弹幕索引文件位置 **/

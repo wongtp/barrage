@@ -1,21 +1,22 @@
 /*
  * Copyleft
  */
-package com.wong.barrage.barrage;
+package com.wong.barrage.barrage.loader.impl;
 
+import java.io.File;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import javax.swing.JOptionPane;
 
+import com.wong.barrage.barrage.BarrageEntity;
+import com.wong.barrage.barrage.loader.BarrageLoadder;
 import com.wong.barrage.config.Constant;
-import com.wong.barrage.util.LogUtil;
-import com.wong.barrage.util.StringUtil;
 
 /**
  * 弹幕加载工具类
@@ -23,7 +24,11 @@ import com.wong.barrage.util.StringUtil;
  * @date 2019-03-09 10:31
  * @version 1.0
  */
-class BarrageLoadder {
+public class BarrageLoadderProxy implements BarrageLoadder {
+    
+    private AbstractBarrageLoader lineBarrageLoadder = new TextBarrageLoadder();
+    private AbstractBarrageLoader jsonBarrageLoadder = new JsonBarrageLoadder();
+    private AbstractBarrageLoader xmlBarrageLoadder = new XmlBarrageLoadder();
     
     /**
      * 按照给定的值获取定量的弹幕数量
@@ -31,30 +36,66 @@ class BarrageLoadder {
      * @param size
      * @return
      */
-    public static List<BarrageEntity> loadFromFile(int pageIndex, int pageSize) {
+    public List<BarrageEntity> load(int pageIndex, int pageSize) {
+        List<Path> pathList = getDictList();
         List<BarrageEntity> barrageList = new ArrayList<>();
-        Path path = Paths.get(Constant.BARRAGE_PATH);
-        if (Files.notExists(path)) {
-            JOptionPane.showMessageDialog(null, Constant.BARRAGE_PATH + " 弹幕文件不见了", "Σ(*ﾟдﾟﾉ)ﾉ", 
-                    JOptionPane.WARNING_MESSAGE);
-            System.exit(0);
-        }
-        try (Stream<String> stream = Files.lines(path)) {
-            stream.skip(pageIndex)
-                // 遇到空行则跳过
-                .filter(new Predicate<String>() {
-                    @Override
-                    public boolean test(String line) {
-                        return !StringUtil.isEmpty(line);
-                    }
-                })
-                .limit(pageSize)
-                .forEach(line -> {
-                    barrageList.add(new BarrageEntity(line));
-                });
+        try {
+            AbstractBarrageLoader loader = null;
+            for (Path path : pathList) {
+                String pathStr = path.toString().toLowerCase();
+                if (pathStr.endsWith(".txt")) {
+                    loader = lineBarrageLoadder;
+                } else if (pathStr.endsWith(".json")) {
+                    loader = jsonBarrageLoadder;
+                } else if (pathStr.endsWith(".xml")) {
+                    loader = xmlBarrageLoadder;
+                }
+                // 索引比文件里面弹幕数量还要多的情况
+                loader.setPath(path);
+                if (pageIndex >= loader.getSize()) {
+                    pageIndex -= loader.getSize();
+                    continue;
+                }
+                loader.load(pageIndex, pageSize, barrageList);
+                if (barrageList.size() >= pageSize) {
+                    break;
+                }
+                pageSize -= barrageList.size();
+                // 读下一个文件
+                pageIndex = 0;
+            }
         } catch (Exception e) {
-            LogUtil.append(Constant.LOG_PATH, "BarrageLoadder thorw exception:" + e.getMessage());
+            e.printStackTrace();
         }
         return barrageList;
+    }
+    
+    private List<Path> getDictList() {
+        Path pathDir = Paths.get(Constant.DICT_PATH);
+        File fileDir = pathDir.toFile();
+        if (!fileDir.exists() || !fileDir.isDirectory() || fileDir.listFiles().length == 0) {
+            JOptionPane.showMessageDialog(null, Constant.DICT_PATH + " 空空如也 Σ(*ﾟдﾟﾉ)ﾉ", null, JOptionPane.WARNING_MESSAGE);
+            System.exit(0);
+        }
+        List<Path> list = new ArrayList<>();
+        try (DirectoryStream<Path> dictStream = Files.newDirectoryStream(pathDir)) {
+            dictStream.forEach(new Consumer<Path>() {
+                @Override
+                public void accept(Path path) {
+                    list.add(path);
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+    
+    public static void main(String[] args) {
+        File dictDir = Paths.get(Constant.DICT_PATH).toFile();
+        if (!dictDir.exists() || !dictDir.isDirectory() || dictDir.listFiles().length == 0) {
+            JOptionPane.showMessageDialog(null, "dict 文件夹空空如也", "Σ(*ﾟдﾟﾉ)ﾉ", JOptionPane.WARNING_MESSAGE);
+            System.exit(0);
+        }
     }
 }
