@@ -21,9 +21,6 @@ public class CharsetUtil {
         try (InputStream is = Files.newInputStream(Paths.get(path))) {
             byte[] head = new byte[3];    
             is.read(head);
-            System.out.println("head[0]:" + head[0] + 
-                    ", head[1]:" + head[1] + 
-                    ", head[2]:" + head[2]);
             if (head[0] == -1 && head[1] == -2) {
                 return Charset.forName("UTF-16");
             }

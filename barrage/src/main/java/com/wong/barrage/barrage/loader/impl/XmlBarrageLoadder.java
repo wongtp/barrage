@@ -3,8 +3,6 @@
  */
 package com.wong.barrage.barrage.loader.impl;
 
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.dom4j.Document;
@@ -13,6 +11,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import com.wong.barrage.barrage.BarrageEntity;
+import com.wong.barrage.util.StringUtil;
 
 /**
  * 按 XML 格式来读取
@@ -34,19 +33,32 @@ class XmlBarrageLoadder extends AbstractBarrageLoader {
         try {
             Document doc = reader.read(getPath().toFile());
             Element root = doc.getRootElement();
-            List<Element> eleList = root.elements();
-            for (Element element : eleList) {
-                System.out.println(element);
+            String rootName = root.getName();
+            // 有道的词典
+            if ("wordbook".equals(rootName)) {
+                parseYoudao(pageIndex, pageSize, barrageList, root);
             }
         } catch (DocumentException e) {
             e.printStackTrace();
         }
-        
     }
     
-    public static void main(String[] args) {
-        XmlBarrageLoadder loadder = new XmlBarrageLoadder();
-        loadder.setPath(Paths.get("dict/2.youdao.xml"));
-        loadder.load(0, 100, new ArrayList<BarrageEntity>());
+    private void parseYoudao(int pageIndex, int pageSize, List<BarrageEntity> barrageList, Element root) {
+        List<Element> itemList = root.elements();
+        int loopSize = pageSize;
+        if (itemList.size() - pageIndex < pageSize) {
+            loopSize = itemList.size();
+        }
+        for (int i = pageIndex; i < loopSize; i++) {
+            Element item = itemList.get(i);
+            String word = item.elementTextTrim("word");
+            String trans = item.elementTextTrim("trans");
+            if (StringUtil.isEmpty(word)) {
+                continue;
+            }
+            System.out.println(word + " " + trans);
+            BarrageEntity entity = new BarrageEntity(word + " " + trans);
+            barrageList.add(entity);
+        }
     }
 }

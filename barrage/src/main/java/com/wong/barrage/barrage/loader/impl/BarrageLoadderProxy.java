@@ -54,7 +54,6 @@ public class BarrageLoadderProxy implements BarrageLoadder {
                 loader.setPath(path);
                 if (pageIndex >= loader.getSize()) {
                     pageIndex -= loader.getSize();
-                    continue;
                 }
                 loader.load(pageIndex, pageSize, barrageList);
                 if (barrageList.size() >= pageSize) {
