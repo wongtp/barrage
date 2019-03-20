@@ -74,7 +74,7 @@ public class BarrageLoadderProxy implements BarrageLoadder {
         Path pathDir = Paths.get(Constant.DICT_PATH);
         File fileDir = pathDir.toFile();
         if (!fileDir.exists() || !fileDir.isDirectory() || fileDir.listFiles().length == 0) {
-            JOptionPane.showMessageDialog(null, Constant.DICT_PATH + " 空空如也 Σ(*ﾟдﾟﾉ)ﾉ", null, JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, Constant.DICT_PATH + " 文件夹竟然是空的 Σ(*ﾟдﾟ)ﾉ");
             System.exit(0);
         }
         List<Path> list = new ArrayList<>();
@@ -89,13 +89,5 @@ public class BarrageLoadderProxy implements BarrageLoadder {
             throw new RuntimeException(e);
         }
         return list;
-    }
-    
-    public static void main(String[] args) {
-        File dictDir = Paths.get(Constant.DICT_PATH).toFile();
-        if (!dictDir.exists() || !dictDir.isDirectory() || dictDir.listFiles().length == 0) {
-            JOptionPane.showMessageDialog(null, "dict 文件夹空空如也", "Σ(*ﾟдﾟﾉ)ﾉ", JOptionPane.WARNING_MESSAGE);
-            System.exit(0);
-        }
     }
 }

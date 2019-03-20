@@ -37,6 +37,6 @@ abstract class AbstractBarrageLoader {
         return path;
     }
     
-    public abstract void load(int pageIndex, int pageSize, List<BarrageEntity> barrageList);
+    abstract void load(int pageIndex, int pageSize, List<BarrageEntity> barrageList);
 
 }
