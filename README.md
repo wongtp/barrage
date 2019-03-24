@@ -15,8 +15,15 @@
  11. 弹幕的拖动
   
 **至于这些功能为什么要做成这样，因为不想背单词呗，所以搞个工具偶尔弹几条出来屏幕上**
-付上一张效果图：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20190317183730653.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L29jcDExNA==,size_16,color_FFFFFF,t_70)
+源码这里就不放出来了，有兴趣的同学可以上 [GitHub](https://github.com/wongtp/barrage) 上看看，这里付上效果图
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190324174100508.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L29jcDExNA==,size_16,color_FFFFFF,t_70)![在这里插入图片描述](https://img-blog.csdnimg.cn/2019032417412021.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L29jcDExNA==,size_16,color_FFFFFF,t_70)
 后续更能
  1. 增加导入功能，可以读取有道等词典的词典数据
  2. 赶紧去学习啊！！搞真么多这些！！
+
+**源码地址：[GitHub](https://github.com/wongtp/barrage)** 
+
+更新历史：
+ 1. 2019-03-24 完成有 道词典 和 金山词霸 导出数据的解析
+
+好了，暂时告一段落，该搞其他的去噜~~
