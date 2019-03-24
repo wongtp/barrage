@@ -3,7 +3,7 @@
  */
 package com.wong.barrage.barrage.loader.impl;
 
-import java.util.List;
+import java.util.Collection;
 
 import com.wong.barrage.barrage.BarrageEntity;
 
@@ -14,14 +14,14 @@ import com.wong.barrage.barrage.BarrageEntity;
  * @version 1.0
  */
 class JsonBarrageLoadder extends AbstractBarrageLoader {
-    
+
     @Override
-    public int getSize() {
-        return 0;
+    boolean parse() {
+        return false;
     }
 
     @Override
-    public void load(int pageIndex, int pageSize, List<BarrageEntity> barrageList) {
-        
+    public void load(int pageIndex, int pageSize, Collection<BarrageEntity> barrageContainer) {
     }
+
 }

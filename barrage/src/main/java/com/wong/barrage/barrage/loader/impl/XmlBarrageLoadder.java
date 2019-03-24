@@ -3,6 +3,7 @@
  */
 package com.wong.barrage.barrage.loader.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.dom4j.Document;
@@ -21,29 +22,26 @@ import com.wong.barrage.util.StringUtil;
  */
 class XmlBarrageLoadder extends AbstractBarrageLoader {
     
+    /** 1:有道单词词典 默认1**/
+    private int type = 1;
     private SAXReader reader = new SAXReader();
+    private Element root;
     
     @Override
-    public int getSize() {
-        return 0;
-    }
-
-    @Override
-    public void load(int pageIndex, int pageSize, List<BarrageEntity> barrageList) {
-        try {
-            Document doc = reader.read(getPath().toFile());
-            Element root = doc.getRootElement();
-            String rootName = root.getName();
-            // 有道的词典
-            if ("wordbook".equals(rootName)) {
-                parseYoudao(pageIndex, pageSize, barrageList, root);
-            }
-        } catch (DocumentException e) {
-            e.printStackTrace();
+    public void load(int pageIndex, int pageSize, Collection<BarrageEntity> barrageList) {
+        switch (type) {
+            case 1:
+                parseYoudao(pageIndex, pageSize, barrageList);
+                break;
+            default:
+                parseYoudao(pageIndex, pageSize, barrageList);
+                break;
         }
     }
     
-    private void parseYoudao(int pageIndex, int pageSize, List<BarrageEntity> barrageList, Element root) {
+    private void parseYoudao(int pageIndex, int pageSize, Collection<BarrageEntity> barrageList) {
+        System.out.println("===== 解析有道翻译数据");
+        // 读取金山词霸数据
         List<Element> itemList = root.elements();
         int loopSize = pageSize;
         if (itemList.size() - pageIndex < pageSize) {
@@ -52,13 +50,28 @@ class XmlBarrageLoadder extends AbstractBarrageLoader {
         for (int i = pageIndex; i < loopSize; i++) {
             Element item = itemList.get(i);
             String word = item.elementTextTrim("word");
-            String trans = item.elementTextTrim("trans");
             if (StringUtil.isEmpty(word)) {
                 continue;
             }
-            System.out.println(word + " " + trans);
-            BarrageEntity entity = new BarrageEntity(word + " " + trans);
-            barrageList.add(entity);
+            String trans = item.elementTextTrim("trans");
+            barrageList.add(new BarrageEntity(word + " " + trans));
         }
+    }
+
+    @Override
+    boolean parse() {
+        try {
+            Document doc = reader.read(getPath().toFile());
+            root = doc.getRootElement();
+            String rootName = root.getName();
+            // 有道的词典
+            if ("wordbook".equals(rootName)) {
+                type = 1;
+                setSize(root.elements().size());
+            }
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 }

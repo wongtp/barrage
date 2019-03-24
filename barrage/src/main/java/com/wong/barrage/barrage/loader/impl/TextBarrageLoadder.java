@@ -3,11 +3,9 @@
  */
 package com.wong.barrage.barrage.loader.impl;
 
-import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.function.Predicate;
+import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import com.wong.barrage.barrage.BarrageEntity;
@@ -22,53 +20,105 @@ import com.wong.barrage.util.StringUtil;
  */
 class TextBarrageLoadder extends AbstractBarrageLoader {
     
-    Stream<String> stream;
+    /** 1:普通逐行文本弹幕， 2:金山词霸文本弹幕 默认1**/
+    private int type = 1;
     
     @Override
-    public void setPath(Path path) {
-        super.setPath(path);
-        try {
-            stream = Files.lines(getPath(), CharsetUtil.resolveCharset(getPath().toString()));
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void load(int pageIndex, int pageSize, Collection<BarrageEntity> barrageList) {
+        switch (type) {
+            case 1:
+                parseNormalText(pageIndex, pageSize, barrageList);
+                break;
+            case 2:
+                parsePowerWord(pageIndex, pageSize, barrageList);
+                break;
+            default:
+                parseNormalText(pageIndex, pageSize, barrageList);
+                break;
         }
     }
     
-    @Override
-    public void load(int pageIndex, int pageSize, List<BarrageEntity> barrageList) {
+    private void parsePowerWord(int pageIndex, int pageSize, Collection<BarrageEntity> barrageList) {
+        System.out.println("===== 解析金山词霸数据");
         try (Stream<String> stream = Files.lines(getPath(), CharsetUtil.resolveCharset(getPath().toString()))) {
             stream.skip(pageIndex)
-                // 遇到空行则跳过
-                .filter(new Predicate<String>() {
-                    @Override
-                    public boolean test(String line) {
-                        return !StringUtil.isEmpty(line);
-                    }
-                })
+                .filter(line -> !StringUtil.isEmpty(line))
                 .limit(pageSize)
-                .forEach(line -> {
-                    barrageList.add(new BarrageEntity(line));
+                .forEach(new Consumer<String>() {
+                    StringBuilder sb = new StringBuilder();
+                    @Override
+                    public void accept(String line) {
+                        if (line.startsWith("+")) {
+                            sb.append(line.substring(1));
+                            sb.append(" ");
+                        }
+                        if (line.startsWith("#")) {
+                            sb.append(line.substring(1));
+                            sb.append(" ");
+                        }
+                        if ("$1".equals(line)) {
+                            barrageList.add(new BarrageEntity(sb.toString()));
+                            sb.setLength(0);
+                        }
+                    }
                 });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
     
-    private void parsePowerWord() {
-        
+    /**
+     * 逐行解析弹幕
+     */
+    private void parseNormalText(int pageIndex, int pageSize, Collection<BarrageEntity> barrageList) {
+        System.out.println("===== 解析普通文本");
+        try (Stream<String> stream = Files.lines(getPath(), CharsetUtil.resolveCharset(getPath().toString()))) {
+            stream.skip(pageIndex)
+                .filter(line -> !StringUtil.isEmpty(line))
+                .limit(pageSize)
+                .forEach(line -> barrageList.add(new BarrageEntity(line)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public int getSize() {
-        Stream<String> stream = null;
-        try {
-            stream = Files.lines(getPath(), CharsetUtil.resolveCharset(getPath().toString()));
-            return (int)stream.count();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            stream.close();
+    boolean parse() {
+        try (Stream<String> stream = Files.lines(getPath(), CharsetUtil.resolveCharset(getPath().toString()))) {
+            MyConsumer consumer = new MyConsumer();
+            stream.filter(line -> !StringUtil.isEmpty(line)).forEach(consumer);
+            // 如果出 20 行的数据现过两次 $1，初步判定为金山词霸的词典，
+            // 这里有个问题就是如果单词本只有一个单词的话就 gg 了，会解析不出来，这个先不管了
+            if (consumer.countDelimiter >= 2) {
+                type = 2;
+            }
+            // 设置弹幕数量
+            switch (type) {
+                case 1:
+                    setSize(consumer.lineCount);
+                    break;
+                case 2:
+                    setSize(consumer.countDelimiter);
+                    break;
+                default:
+                    setSize(consumer.lineCount);
+                    break;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return 0;
+        return true;
+    }
+    
+    private class MyConsumer implements Consumer<String> {
+        int lineCount, countDelimiter;
+        @Override
+        public void accept(String line) {
+            // 金山词霸用 $1 占一整行来拆分词典里的词
+            if ("$1".equals(line)) {
+                ++countDelimiter;
+            }
+            ++lineCount;
+        }
     }
 }

@@ -22,7 +22,7 @@ import sun.font.FontDesignMetrics;
  * @date 2019-03-07 22:11
  * @version 1.0
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "restriction"})
 public class BarrageEntity extends JLabel {
     
     private int screenWidth = (int)Config.getScreenSize().getWidth();

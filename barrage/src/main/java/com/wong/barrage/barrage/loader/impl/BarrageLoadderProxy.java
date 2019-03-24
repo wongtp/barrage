@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.swing.JOptionPane;
 
@@ -50,12 +49,14 @@ public class BarrageLoadderProxy implements BarrageLoadder {
                 } else if (pathStr.endsWith(".xml")) {
                     loader = xmlBarrageLoadder;
                 }
-                // 索引比文件里面弹幕数量还要多的情况
-                loader.setPath(path);
+                loader.parse(path);
+                // 索引比文件里面弹幕数量还要多的情况就跳到下一个弹幕文件
                 if (pageIndex >= loader.getSize()) {
                     pageIndex -= loader.getSize();
+                    continue;
                 }
                 loader.load(pageIndex, pageSize, barrageList);
+                // 加载回来的数据比预期的要少，判断一下加载
                 if (barrageList.size() >= pageSize) {
                     break;
                 }
@@ -78,12 +79,7 @@ public class BarrageLoadderProxy implements BarrageLoadder {
         }
         List<Path> list = new ArrayList<>();
         try (DirectoryStream<Path> dictStream = Files.newDirectoryStream(pathDir)) {
-            dictStream.forEach(new Consumer<Path>() {
-                @Override
-                public void accept(Path path) {
-                    list.add(path);
-                }
-            });
+            dictStream.forEach(path -> list.add(path));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
