@@ -15,15 +15,16 @@ import com.wong.barrage.view.MainWindow;
 public class App {
     
     public static void main(String[] args) {
-        Runtime runtime = Runtime.getRuntime();
-        runtime.addShutdownHook(new Thread(new Runnable() {
+        MainWindow window = MainWindow.init();
+        BarrageLauncher launcher = BarrageLauncher.launchOnFrame(window);
+        
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
+                System.out.println("adsadf");
+                launcher.shutdownThreadPool();
                 System.exit(0);
             }
         }));
-        MainWindow window = MainWindow.init();
-        BarrageLauncher launcher = BarrageLauncher.launchOnFrame(window.getFrame());
-        window.addShutPopupMenu(launcher.getPopMenu());
     }
 }

@@ -28,7 +28,7 @@ public class MainWindow {
     
     private JFrame frame;
     /** 定义系统托盘图标弹出菜单 **/
-    private final PopupMenu popupMenu = new PopupMenu();
+    public PopupMenu popupMenu = new PopupMenu();
     
     public static MainWindow init() {
         MainWindow window = new MainWindow();
@@ -38,22 +38,6 @@ public class MainWindow {
     
     public JFrame getFrame() {
         return frame;
-    }
-    
-    /**
-     * @param launcher
-     */
-    public void addShutPopupMenu(PopupMenuCallBack callBack) {
-        if(SystemTray.isSupported()) {
-            final MenuItem shut = new MenuItem(callBack.getMenuName());
-            shut.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    callBack.actionPerformed(e);
-                }
-            });
-            popupMenu.addSeparator();
-            popupMenu.add(shut);
-        }
     }
     
     private MainWindow() {}
@@ -80,12 +64,12 @@ public class MainWindow {
         // 判断当前系统是否支持系统托盘
         if(SystemTray.isSupported()) {
             // 通过静态方法得到系统托盘
-            final SystemTray tray = SystemTray.getSystemTray();
+            SystemTray tray = SystemTray.getSystemTray();
             ImageIcon img = new ImageIcon(getClass().getResource(Constant.ICON_PATH));
             // 创建 TrayIcon对象得到托盘图标
             TrayIcon trayIcon = new TrayIcon(img.getImage(), "弹幕", popupMenu);
             // 按下退出键
-            final MenuItem exit = new MenuItem("exit");
+            MenuItem exit = new MenuItem("exit");
             exit.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     tray.remove(trayIcon);

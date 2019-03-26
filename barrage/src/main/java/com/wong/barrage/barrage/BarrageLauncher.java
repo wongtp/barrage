@@ -3,7 +3,11 @@
  */
 package com.wong.barrage.barrage;
 
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +26,7 @@ import com.wong.barrage.barrage.loader.impl.BarrageLoadderProxy;
 import com.wong.barrage.config.Config;
 import com.wong.barrage.config.Constant;
 import com.wong.barrage.util.LogUtil;
-import com.wong.barrage.view.PopupMenuCallBack;
+import com.wong.barrage.view.MainWindow;
 
 /**
  * 弹幕管理与移动控制类
@@ -48,8 +52,11 @@ public class BarrageLauncher {
     /**
      * 开始你的表演吧！
      */
-    public static BarrageLauncher launchOnFrame(JFrame frame) {
-        return new BarrageLauncher().init(frame);
+    public static BarrageLauncher launchOnFrame(MainWindow window) {
+        BarrageLauncher launcher = new BarrageLauncher();
+        launcher.setPopMenu(window.popupMenu);
+        launcher.init(window.getFrame());
+        return launcher;
     }
     
     /**
@@ -61,8 +68,26 @@ public class BarrageLauncher {
         frame.add(barrage);
     }
     
-    public ShutNextBatchPopMenu getPopMenu() {
-        return new ShutNextBatchPopMenu();
+    public void shutdownThreadPool() {
+        cacheThreadPool.shutdownNow();
+        scheduledThreadPool.shutdownNow();
+    }
+    
+    /**
+     * 添加弹幕发射右键菜单
+     * @param popupMenu
+     */
+    private void setPopMenu(final PopupMenu popupMenu) {
+        if(SystemTray.isSupported()) {
+            final MenuItem shut = new MenuItem("shut");
+            shut.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    cacheThreadPool.submit(batchLoader);
+                }
+            });
+            popupMenu.addSeparator();
+            popupMenu.add(shut);
+        }
     }
     
     private BarrageLauncher init(JFrame frame) {
@@ -150,21 +175,6 @@ public class BarrageLauncher {
                     barragelList.remove(barrage);
                 }
             }
-        }
-    }
-    
-    /**
-     * 用于托盘菜单点击发射下一批弹幕
-     */
-    class ShutNextBatchPopMenu implements PopupMenuCallBack {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            cacheThreadPool.submit(batchLoader);
-        }
-        
-        @Override
-        public String getMenuName() {
-            return "shut";
         }
     }
 }

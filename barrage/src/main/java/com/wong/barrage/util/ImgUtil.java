@@ -24,6 +24,7 @@ import sun.font.FontDesignMetrics;
  * @date 2019-03-17 11:08
  * @version 1.0
  */
+@SuppressWarnings({"restriction"})
 public class ImgUtil {
     
     /**
