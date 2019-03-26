@@ -3,8 +3,6 @@
  */
 package com.wong.barrage;
 
-import javax.swing.JFrame;
-
 import com.wong.barrage.barrage.BarrageLauncher;
 import com.wong.barrage.view.MainWindow;
 
@@ -17,14 +15,15 @@ import com.wong.barrage.view.MainWindow;
 public class App {
     
     public static void main(String[] args) {
-        Runtime runtime = Runtime.getRuntime();  
+        Runtime runtime = Runtime.getRuntime();
         runtime.addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
                 System.exit(0);
             }
         }));
-        JFrame frame = new MainWindow().init();
-        new BarrageLauncher(frame).launch();
+        MainWindow window = MainWindow.init();
+        BarrageLauncher launcher = BarrageLauncher.launchOnFrame(window.getFrame());
+        window.addShutPopupMenu(launcher.getPopMenu());
     }
 }

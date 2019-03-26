@@ -38,8 +38,13 @@ class TextBarrageLoadder extends AbstractBarrageLoader {
         }
     }
     
+    /**
+     * 解析金山词霸数据
+     * @param pageIndex
+     * @param pageSize
+     * @param barrageList
+     */
     private void parsePowerWord(int pageIndex, int pageSize, Collection<BarrageEntity> barrageList) {
-        System.out.println("===== 解析金山词霸数据");
         try (Stream<String> stream = Files.lines(getPath(), CharsetUtil.resolveCharset(getPath().toString()))) {
             stream.skip(pageIndex)
                 .filter(line -> !StringUtil.isEmpty(line))
@@ -68,10 +73,9 @@ class TextBarrageLoadder extends AbstractBarrageLoader {
     }
     
     /**
-     * 逐行解析弹幕
+     * 逐行解析普通文本弹幕
      */
     private void parseNormalText(int pageIndex, int pageSize, Collection<BarrageEntity> barrageList) {
-        System.out.println("===== 解析普通文本");
         try (Stream<String> stream = Files.lines(getPath(), CharsetUtil.resolveCharset(getPath().toString()))) {
             stream.skip(pageIndex)
                 .filter(line -> !StringUtil.isEmpty(line))

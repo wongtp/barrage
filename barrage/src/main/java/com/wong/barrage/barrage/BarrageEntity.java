@@ -82,6 +82,7 @@ public class BarrageEntity extends JLabel {
         if (stop) {
             return;
         }
+        this.setVisible(true);
         if (rightDirect) {
             this.setLocation(moveWidth += speed, this.getY());
             if (this.getX() > screenWidth) {
