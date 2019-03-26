@@ -16,15 +16,6 @@ public class App {
     
     public static void main(String[] args) {
         MainWindow window = MainWindow.init();
-        BarrageLauncher launcher = BarrageLauncher.launchOnFrame(window);
-        
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("adsadf");
-                launcher.shutdownThreadPool();
-                System.exit(0);
-            }
-        }));
+        BarrageLauncher.launchOnFrame(window);
     }
 }

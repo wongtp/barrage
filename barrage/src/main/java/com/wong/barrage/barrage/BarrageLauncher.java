@@ -68,18 +68,13 @@ public class BarrageLauncher {
         frame.add(barrage);
     }
     
-    public void shutdownThreadPool() {
-        cacheThreadPool.shutdownNow();
-        scheduledThreadPool.shutdownNow();
-    }
-    
     /**
      * 添加弹幕发射右键菜单
      * @param popupMenu
      */
-    private void setPopMenu(final PopupMenu popupMenu) {
+    private void setPopMenu(PopupMenu popupMenu) {
         if(SystemTray.isSupported()) {
-            final MenuItem shut = new MenuItem("shut");
+            MenuItem shut = new MenuItem("shut");
             shut.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     cacheThreadPool.submit(batchLoader);
