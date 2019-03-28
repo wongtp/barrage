@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  */
 public class StringUtil {
     
-    // 用于判断字符串是不是数字
+    /** 用于判断字符串是不是数字 **/
     private static Pattern PATTERN_NUMBER = Pattern.compile("^[\\d]+$");
 	
     /**

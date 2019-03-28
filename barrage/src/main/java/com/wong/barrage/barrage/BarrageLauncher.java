@@ -36,26 +36,28 @@ import com.wong.barrage.view.MainWindow;
  */
 public class BarrageLauncher {
     
-    // 用来放置弹幕的窗体
+    /** 用来放置弹幕的窗体 **/
     private JFrame frame;
-    // 用于存放需要发射的弹幕
+    /** 用于存放需要发射的弹幕 **/
     private List<BarrageEntity> barragelList = new CopyOnWriteArrayList<BarrageEntity>();
-    // 负责定时分批加载弹幕
+    /** 负责定时分批加载弹幕 **/
     private ScheduledExecutorService scheduledThreadPool;
     private ExecutorService cacheThreadPool;
     private BarrageLoadder barrageLoadder = new BarrageLoadderProxy();
     private BatchLoader batchLoader = new BatchLoader();
-    // 弹幕批次数据索引
+    /** 弹幕批次数据索引 **/
     int pageIndex = Config.getPageIndex();
+    /** 用来判断该程序是否要持续发射弹幕 **/
+    boolean runFlag = true;
     private BarrageLauncher() {}
     
     /**
      * 开始你的表演吧！
      */
-    public static BarrageLauncher launchOnFrame(MainWindow window) {
+    public static BarrageLauncher launchOnFrame(final MainWindow window) {
         BarrageLauncher launcher = new BarrageLauncher();
         launcher.setPopMenu(window.popupMenu);
-        launcher.init(window.getFrame());
+        launcher.init(window.frame);
         return launcher;
     }
     
@@ -72,9 +74,9 @@ public class BarrageLauncher {
      * 添加弹幕发射右键菜单
      * @param popupMenu
      */
-    private void setPopMenu(PopupMenu popupMenu) {
+    private void setPopMenu(final PopupMenu popupMenu) {
         if(SystemTray.isSupported()) {
-            MenuItem shut = new MenuItem("shut");
+            final MenuItem shut = new MenuItem("shut");
             shut.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     cacheThreadPool.submit(batchLoader);
@@ -82,10 +84,35 @@ public class BarrageLauncher {
             });
             popupMenu.addSeparator();
             popupMenu.add(shut);
+            
+            final MenuItem clear = new MenuItem("clearAndStop");
+            clear.addActionListener(new ActionListener() {
+                boolean clearFlag = false;
+                public void actionPerformed(ActionEvent e) {
+                    if (!clearFlag) {
+                        for (BarrageEntity barrage : barragelList) {
+                            barrage.setVisible(false);
+                            frame.remove(barrage);
+                            barragelList.remove(barrage);
+                            barrage.invalidate();
+                            barrage = null;
+                        }
+                        clear.setLabel("resume");
+                        clearFlag = true;
+                        runFlag = false;
+                    } else {
+                        clear.setLabel("clearAndStop");
+                        clearFlag = false;
+                        runFlag = true;
+                    }
+                }
+            });
+            popupMenu.addSeparator();
+            popupMenu.add(clear);
         }
     }
     
-    private BarrageLauncher init(JFrame frame) {
+    private BarrageLauncher init(final JFrame frame) {
         this.frame = frame;
         if (Config.isRefershPageIndex()) {
             this.pageIndex = 0;
@@ -119,6 +146,7 @@ public class BarrageLauncher {
         public void run() {
             try {
                 List<BarrageEntity> barrageList = barrageLoadder.load(pageIndex, Config.getBatchNumber());
+                LogUtil.append(Constant.LOG_PATH, "load barrage:" + pageIndex + ", size:" + barrageList.size());
                 if (barrageList.size() > 0) {
                     pageIndex += Config.getBatchNumber();
                     for (BarrageEntity barrage : barrageList) {
@@ -147,11 +175,14 @@ public class BarrageLauncher {
         public void run() {
             try {
                 while (true) {
-                    this.move();
-                    if (!Config.isRadomSpeed()) {
-                        Thread.sleep(Config.getSpeed());
-                    } else {
-                        Thread.sleep(20);
+                    if (runFlag) {
+                        frame.setAlwaysOnTop(true);
+                        this.move();
+                        if (!Config.isRadomSpeed()) {
+                            Thread.sleep(Config.getSpeed());
+                        } else {
+                            Thread.sleep(20);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -168,6 +199,8 @@ public class BarrageLauncher {
                 if (barrage.isFinish()) {
                     frame.remove(barrage);
                     barragelList.remove(barrage);
+                    barrage.invalidate();
+                    barrage = null;
                 }
             }
         }

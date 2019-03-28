@@ -26,18 +26,14 @@ import com.wong.barrage.config.Constant;
  */
 public class MainWindow {
     
-    private JFrame frame;
+    public JFrame frame;
     /** 定义系统托盘图标弹出菜单 **/
-    public PopupMenu popupMenu = new PopupMenu();
+    public final PopupMenu popupMenu = new PopupMenu();
     
     public static MainWindow init() {
         MainWindow window = new MainWindow();
         window.initWindow();
         return window;
-    }
-    
-    public JFrame getFrame() {
-        return frame;
     }
     
     private MainWindow() {}
@@ -64,12 +60,12 @@ public class MainWindow {
         // 判断当前系统是否支持系统托盘
         if(SystemTray.isSupported()) {
             // 通过静态方法得到系统托盘
-            SystemTray tray = SystemTray.getSystemTray();
-            ImageIcon img = new ImageIcon(getClass().getResource(Constant.ICON_PATH));
+            final SystemTray tray = SystemTray.getSystemTray();
+            final ImageIcon img = new ImageIcon(getClass().getResource(Constant.ICON_PATH));
             // 创建 TrayIcon对象得到托盘图标
-            TrayIcon trayIcon = new TrayIcon(img.getImage(), "弹幕", popupMenu);
+            final TrayIcon trayIcon = new TrayIcon(img.getImage(), "弹幕", popupMenu);
             // 按下退出键
-            MenuItem exit = new MenuItem("exit");
+            final MenuItem exit = new MenuItem("exit");
             exit.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     tray.remove(trayIcon);

@@ -15,7 +15,7 @@ import com.wong.barrage.view.MainWindow;
 public class App {
     
     public static void main(String[] args) {
-        MainWindow window = MainWindow.init();
+        final MainWindow window = MainWindow.init();
         BarrageLauncher.launchOnFrame(window);
     }
 }

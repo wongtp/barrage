@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import com.wong.barrage.barrage.BarrageEntity;
 import com.wong.barrage.barrage.loader.BarrageLoadder;
 import com.wong.barrage.config.Constant;
+import com.wong.barrage.util.LogUtil;
 
 /**
  * 弹幕加载工具类
@@ -56,6 +57,7 @@ public class BarrageLoadderProxy implements BarrageLoadder {
                     continue;
                 }
                 loader.load(pageIndex, pageSize, barrageList);
+                LogUtil.append(Constant.LOG_PATH, "load:" + pageIndex + ", size:" + barrageList.size());
                 // 加载回来的数据比预期的要少，判断一下加载
                 if (barrageList.size() >= pageSize) {
                     break;
