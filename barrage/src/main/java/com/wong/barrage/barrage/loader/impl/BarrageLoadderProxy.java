@@ -51,12 +51,15 @@ public class BarrageLoadderProxy implements BarrageLoadder {
                     loader = xmlBarrageLoadder;
                 }
                 loader.parse(path);
+                System.out.println("\n\n============================");
+                System.out.println(path + ", pageIndex:" + pageIndex + ", loader.getSize(): " + loader.getSize());
                 // 索引比文件里面弹幕数量还要多的情况就跳到下一个弹幕文件
                 if (pageIndex >= loader.getSize()) {
                     pageIndex -= loader.getSize();
                     continue;
                 }
                 loader.load(pageIndex, pageSize, barrageList);
+                System.out.println(path + ", pageIndex:" + pageIndex + ", size: " + barrageList.size());
                 LogUtil.append(Constant.LOG_PATH, "load:" + pageIndex + ", size:" + barrageList.size());
                 // 加载回来的数据比预期的要少，判断一下加载
                 if (barrageList.size() >= pageSize) {

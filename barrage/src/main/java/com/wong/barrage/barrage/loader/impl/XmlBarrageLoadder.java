@@ -46,13 +46,13 @@ class XmlBarrageLoadder extends AbstractBarrageLoader {
      * @param barrageList
      */
     private void parseYoudao(int pageIndex, int pageSize, Collection<BarrageEntity> barrageList) {
-        // 读取金山词霸数据
+        // 读取有道点数据
         List<Element> itemList = root.elements();
-        int loopSize = pageSize;
-        if (itemList.size() - pageIndex < pageSize) {
-            loopSize = itemList.size();
+        int loopEnd = pageIndex + pageSize;
+        if (itemList.size() < loopEnd) {
+            loopEnd = itemList.size();
         }
-        for (int i = pageIndex; i < loopSize; i++) {
+        for (int i = pageIndex; i < loopEnd; i++) {
             Element item = itemList.get(i);
             String word = item.elementTextTrim("word");
             if (StringUtil.isEmpty(word)) {
